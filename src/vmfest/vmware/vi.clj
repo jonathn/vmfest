@@ -138,7 +138,7 @@ any call to vi java in this to have it retry with an incramental delay"
   (.waitForMe (.revertToCurrentSnapshot_Task
                (get-vm-by-name vm-name) (get-host-by-name host-name))))
 
-(defn delete-snapshot)
+;;(defn delete-snapshot)
 
 (defn delete [vm-to-delete]
   (println "deleting: " (.getName vm-to-delete))
@@ -165,7 +165,7 @@ any call to vi java in this to have it retry with an incramental delay"
       (delete vm-to-delete))))
 
 (defn delete-testbed [pattern]
-  (println "deleting testbed " number)
+  (println "deleting testbed " pattern)
   (doall (pmap delete (vms-in-testbed pattern))))
 
 (defn start-testbed [pattern host]
