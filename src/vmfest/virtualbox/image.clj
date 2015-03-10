@@ -51,7 +51,7 @@
             orig-medium
             (.openMedium vb orig DeviceType/HardDisk AccessMode/ReadOnly false)
             dest-medium (.createHardDisk vb "vdi" dest)
-            progress (.cloneTo orig-medium dest-medium (long 0) nil)]
+            progress (.cloneTo orig-medium dest-medium [] nil)]
         ;; wait indefinitely for the cloning
         (.waitForCompletion progress (Integer. -1))
         (make-immutable dest-medium)
