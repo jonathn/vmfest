@@ -71,14 +71,12 @@ any call to vi java in this to have it retry with an incramental delay"
 
 (defmacro with-vc-login
   "Logs into a VC, runs the opperations in the body and then logs out"
-  [{vc :vc username :username password :password} & body]
-  (let [vc# vc
-        username# username
-        password# password]
-    `(binding [*vc* {:connection (get-si ~vc# ~username# ~password#)
-                   :url ~vc#
-                   :username ~username#
-                     :password ~password#}]
+  [creds & body]
+  `(let [{vc# :vc username# :username password# :password} ~creds]
+     (binding [*vc* {:connection (get-si vc# username# password#)
+                     :url vc#
+                     :username username#
+                     :password password#}]
        (try
          ~@body
          (finally
