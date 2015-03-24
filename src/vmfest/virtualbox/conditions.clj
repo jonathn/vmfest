@@ -39,7 +39,7 @@
   [^IVirtualBoxErrorInfo ei]
   (log/debugf "error-info: ei:%s" ei)
   {:text (.getText ei)
-   :interface-id (.getIntefaceID ei)
+   :interface-id (.getInterfaceID ei)
    :component (.getComponent ei)
    :typed-wrapped (.getTypedWrapped ei)
    :result-code (.getResultCode ei)

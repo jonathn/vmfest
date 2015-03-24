@@ -191,6 +191,19 @@ with a virtualbox.
                           (:id ~machine)
                           (.getMessage e#))}))))
 
+(defmacro with-nonlocking-session
+  [machine [session vb-m] & body]
+  #_{:pre [(model/Machine? machine)]}
+  `(try
+     (with-vbox (:server ~machine) [mgr# vbox#]
+       (let [~session (.getSessionObject ^VirtualBoxManager mgr#)
+             ~vb-m (.findMachine ^IVirtualBox vbox# (:id ~machine))]
+         ~@body))
+     (catch VBoxException e#
+       (conditions/wrap-exception e#
+         {:message (format "Cannot open session with machine '%s' reason:%s"
+                           (:id ~machine)
+                           (.getMessage e#))}))))
 
 (defmacro with-no-session
   [machine [vb-m] & body]

@@ -483,11 +483,13 @@ VirtualBox"
   (let [end-time (+ (current-time-millis) (or timout-in-ms 1500))
         unlocked? (fn []
                     (let [state (or (try
-                                      (session/with-session
-                                        m :read [s _] (.getState s))
-                                      (catch Exception _))
+                                      (session/with-nonlocking-session
+                                        m [s _] (.getState s))
+                                      (catch Exception e
+                                        (log/error e)
+                                        nil))
                                     SessionState/Locked)]
-                      (log/tracef
+                      (log/debugf
                        "wait-for-lockable-session-state: state %s" state)
                       (if (= SessionState/Locked state)
                         (Thread/sleep 250)

@@ -90,12 +90,12 @@
 (defn prepare-job
   [image-url vbox
    & {:keys [model-name temp-dir meta-file-name
-             meta-url meta model-file-name model-path]
+             meta-url meta model-file-name model-path gzipped?]
       :as options}]
   (let [[directory ^String image-file-name] (directory-and-file-name-from-url
                                              image-url)
         image-name (file-name-without-extensions image-file-name)
-        gzipped? (.endsWith image-file-name ".gz")
+        gzipped? (or (.endsWith image-file-name ".gz") gzipped?)
         vagrant-box? (.endsWith image-file-name ".box")
         model-name (or model-name image-name)
         model-unique-name (str "vmfest-" model-name)
@@ -114,7 +114,7 @@
      :key-file (str model-path File/separator "vagrant-key")
      :key-url "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
      :image-file (if vagrant-box?
-                   (str temp-dir File/separator "box-disk1.vmdk")
+                   (str temp-dir File/separator (or (:device-file meta) "box-disk1.vmdk"))
                    (str temp-dir File/separator image-name ".vdi"))
      :model-name model-name
      :model-path model-path
@@ -158,7 +158,9 @@
       (log/infof "%s: Unpacking %s into %s"
                  model-name gzipped-image-file temp-dir)
       (when-not *dry-run*
-        (untar gzipped-image-file temp-dir)))
+        (gunzip gzipped-image-file (str gzipped-image-file ".tar")) ;TODO: HACK!
+        (untar (str gzipped-image-file ".tar") temp-dir)            ;TODO: HACK!
+        #_(untar gzipped-image-file temp-dir)))
     (log/infof "%s: File is not a vagrant box" model-name))
   options)
 
