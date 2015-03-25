@@ -304,7 +304,7 @@ See IVirtualbox::openRemoteSession for more details"
       (finally
         ;; creating the VM also creates a session with the VM. We need
         ;; to make sure we don't hold on to this session #67.
-        (.unlockMachine session)))))
+        (session/unlock-machine session)))))
 
 
 (defn save-settings [^IMachine machine]

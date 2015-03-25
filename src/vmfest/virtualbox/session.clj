@@ -10,6 +10,7 @@ destruction of sessions with the VBox servers"
             VirtualBoxManager
             IVirtualBox
             VBoxException
+            SessionState
             LockType
             IMachine
             ISession]
@@ -160,6 +161,11 @@ with a virtualbox.
   {:write LockType/Write
    :shared LockType/Shared})
 
+(defn locked?
+  [^ISession session]
+  {:pre [session]}
+  (= SessionState/Locked (.getState session)))
+
 (defn lock-machine
   [^IMachine vb-machine ^ISession session lock-type]
   {:pre [vb-machine session]}
@@ -169,8 +175,9 @@ with a virtualbox.
 (defn unlock-machine
   [^ISession session]
   {:pre [session]}
-  (log/debugf "unlock-machine %s" (.. session getMachine getName))
-  (.unlockMachine session))
+  (when (locked? session)
+    (log/debugf "unlock-machine %s" (.. session getMachine getName))
+    (.unlockMachine session)))
 
 (defmacro with-session
   [machine type [session vb-m] & body]

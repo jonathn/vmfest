@@ -481,24 +481,24 @@ VirtualBox"
    Returns true if wait succeeds, nil otherwise."
   [m & [timout-in-ms]]
   (let [end-time (+ (current-time-millis) (or timout-in-ms 1500))
-        unlocked? (fn []
-                    (let [state (or (try
-                                      (session/with-nonlocking-session
-                                        m [s _] (.getState s))
-                                      (catch Exception e
-                                        (log/error e)
-                                        nil))
-                                    SessionState/Locked)]
+        locked?  (fn []
+                    (let [;;state (try
+                          ;;        (session/with-nonlocking-session
+                          ;;          m [s _] (.getState s))
+                          ;;        (catch Exception e
+                          ;;          (log/error e)
+                          ;;          SessionState/Locked))
+                          state (session/with-nonlocking-session
+                                  m [s _] (.getState s))]
                       (log/debugf
                        "wait-for-lockable-session-state: state %s" state)
-                      (if (= SessionState/Locked state)
-                        (Thread/sleep 250)
-                        true)))]
+                      (= SessionState/Locked state)))]
     (loop []
       (if (< (current-time-millis) end-time)
-        (if (unlocked?)
-          true
-          (recur))
+        (if (locked?)
+          (do (Thread/sleep 250)
+              (recur))
+          true)
         nil))))
 
 (defn state [^Machine m]
